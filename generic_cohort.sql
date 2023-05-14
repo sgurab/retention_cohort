@@ -32,16 +32,19 @@ with date_range as (
     base_sch.client_id,
     count(distinct if(churn_at is not null and date_trunc(churn_at,month) <= calendar_month, client_id,null)) as churn_count, 
     count(distinct client_id) as escolas
+  
   from base_sch
   cross join date_range
 
   where 
     calendar_month >= "2022-01-01" and cohort >= "2022-01-01"
     and date_diff(calendar_month,cohort,month) >= 0
+  
   group by 
     calendar_month, 
     cohort, 
     client_id
+  
   order by 
     client_id, 
     calendar_month
@@ -53,10 +56,13 @@ select
   sum(escolas) as escolas_safra,
   sum(churn_count) as churns,
   (sum(escolas) - sum(churn_count))/sum(escolas) as retention_rate
+
 from monthly_cis
+
 group by 
   months_since_creation, 
   cohort
+
 order by 
   cohort, 
   months_since_creation
